@@ -42,6 +42,9 @@ class MiscUtilsTest(unittest.TestCase):
         assert hyou.util.format_column_address(1) == 'B'
         assert hyou.util.format_column_address(25) == 'Z'
         assert hyou.util.format_column_address(26) == 'AA'
+        assert hyou.util.format_column_address(27) == 'AB'
+        assert hyou.util.format_column_address(26 + 26) == 'BA'
+        assert hyou.util.format_column_address(26 + 26 + 1) == 'BB'
         assert hyou.util.format_column_address(26 + 26 * 26 - 1) == 'ZZ'
         assert hyou.util.format_column_address(26 + 26 * 26) == 'AAA'
 

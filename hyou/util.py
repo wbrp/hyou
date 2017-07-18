@@ -14,9 +14,12 @@
 
 from __future__ import (
     absolute_import, division, print_function, unicode_literals)
+
+import string
 from builtins import (  # noqa: F401
     ascii, bytes, chr, dict, filter, hex, input, int, list, map, next,
     object, oct, open, pow, range, round, str, super, zip)
+
 
 import json
 
@@ -36,15 +39,11 @@ def to_native_str(s):
 
 
 def format_column_address(index_column):
-    k = index_column
-    p = 1
-    while k >= 26 ** p:
-        k -= 26 ** p
-        p += 1
-    s = ''
-    for i in range(p):
-        s = chr(ord('A') + k % 26) + s
-    return s
+    letters = []
+    while index_column >= 0:
+        letters.append(string.ascii_uppercase[index_column % 26])
+        index_column = index_column // 26 - 1
+    return ''.join(reversed(letters))
 
 
 def format_range_a1_notation(
