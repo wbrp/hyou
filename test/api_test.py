@@ -19,9 +19,16 @@ import contextlib
 import logging
 import unittest
 
+import googleapiclient.errors
+import mock
+import nose.tools
+
 import hyou.api
 
 import http_mocks
+
+
+CREDENTIALS_FILE = 'unittest-collection.json'
 
 
 @contextlib.contextmanager
@@ -45,5 +52,22 @@ class APITest(unittest.TestCase):
     def test_discovery(self):
         with suppress_oauth2client_warnings():
             hyou.api.API(
-                http_mocks.ReplayHttp('unittest-collection.json'),
+                http_mocks.ReplayHttp(CREDENTIALS_FILE),
                 discovery=True)
+
+    def test_discovery_retry_on_error(self):
+        patcher = mock.patch('time.sleep')  # Makes the following much faster
+        patcher.start()
+
+        with suppress_oauth2client_warnings():
+            hyou.api.API(
+                http_mocks.ErrorHttp(
+                    CREDENTIALS_FILE, num_errors=hyou.api.NUM_RETRIES),
+                discovery=True)
+            with nose.tools.assert_raises(googleapiclient.errors.HttpError):
+                hyou.api.API(
+                    http_mocks.ErrorHttp(
+                        CREDENTIALS_FILE, num_errors=hyou.api.NUM_RETRIES+1),
+                    discovery=True)
+
+        patcher.stop()

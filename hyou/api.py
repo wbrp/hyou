@@ -15,18 +15,56 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals)
 
+import functools
+import random
+import time
+
 import googleapiclient.discovery
+import googleapiclient.errors
 
 from . import schema
-
 
 SHEETS_API_DISCOVERY_URL = (
     'https://sheets.googleapis.com/$discovery/rest?version=v4')
 
+NUM_RETRIES = 4
+
+
+def retry_on_server_error(wrapped_func):
+    """
+    Return a decorator to retry API calls which fail with 50x status codes,
+    using an exponential backoff strategy with up to `NUM_RETRIES` retries.
+    """
+
+    @functools.wraps(wrapped_func)
+    def wrapper(*args, **kwargs):
+        partial_func = functools.partial(wrapped_func, *args, **kwargs)
+        return _do_exp_backoff(partial_func, NUM_RETRIES)
+
+    return wrapper
+
+
+def _do_exp_backoff(func, max_num_retries):
+    """Call `func` and perform exponential backoff for 50x errors."""
+    num_retry = 0
+    upper_bound = 0
+    while True:
+        backoff = random.random() * upper_bound
+        time.sleep(backoff)
+        try:
+            return func()
+        except googleapiclient.errors.HttpError as err:
+            if err.resp.status >= 500 and num_retry < max_num_retries:
+                upper_bound = 2 ^ num_retry
+                num_retry += 1
+            else:
+                raise
+
 
 class API(object):
 
-    def __init__(self, http, discovery):
+    @retry_on_server_error
+    def __init__(self, http, discovery=False):
         if discovery:
             self.sheets = googleapiclient.discovery.build(
                 'sheets', 'v4', http=http,

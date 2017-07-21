@@ -20,7 +20,9 @@ import httplib2
 import json
 import logging
 import os
+import random
 
+import googleapiclient.errors
 from six.moves.urllib import parse
 
 from hyou import py3
@@ -139,3 +141,21 @@ class ReplayHttp(object):
 
         # Do not return |response_headers| for consistency on replay.
         return (_make_ok_response(), response_body)
+
+
+class ErrorHttp(ReplayHttp):
+
+    def __init__(self, json_name, num_errors):
+        self.num_errors = num_errors
+        self.request_num = 0
+        super(ErrorHttp, self).__init__(json_name)
+
+    def request(self, uri, method='GET', body=None, *args, **kwargs):
+        self.request_num += 1
+        if self.request_num <= self.num_errors:
+            error_code = random.randint(500, 599)
+            response = httplib2.Response({'status': error_code})
+            raise googleapiclient.errors.HttpError(response, b'')
+        else:
+            return super(ErrorHttp, self).request(
+                uri, method, body, *args, **kwargs)

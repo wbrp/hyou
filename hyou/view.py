@@ -17,6 +17,7 @@ from __future__ import (
 
 import six
 
+from . import api
 from . import py3
 from . import util
 
@@ -42,6 +43,7 @@ class View(util.CustomMutableFixedList):
         self._cells_fetched = False
         del self._queued_updates[:]
 
+    @api.retry_on_server_error
     def _ensure_cells_fetched(self):
         if self._cells_fetched:
             return
@@ -62,6 +64,7 @@ class View(util.CustomMutableFixedList):
                 self._input_value_map.setdefault((index_row, index_col), value)
         self._cells_fetched = True
 
+    @api.retry_on_server_error
     def commit(self):
         if not self._queued_updates:
             return

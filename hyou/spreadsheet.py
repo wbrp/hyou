@@ -17,6 +17,7 @@ from __future__ import (
 
 import datetime
 
+from . import api
 from . import util
 from . import worksheet
 
@@ -33,6 +34,7 @@ class Spreadsheet(util.LazyOrderedDictionary):
     def __repr__(self):
         return str('Spreadsheet(key=%r)') % (self.key,)
 
+    @api.retry_on_server_error
     def refresh(self, entry=None):
         if entry is not None:
             self._entry = entry
@@ -90,6 +92,7 @@ class Spreadsheet(util.LazyOrderedDictionary):
         self.refresh(new_entry)
 
     @property
+    @api.retry_on_server_error
     def updated(self):
         if not self._updated:
             response = self._api.drive.files().get(fileId=self.key).execute()
@@ -107,6 +110,7 @@ class Spreadsheet(util.LazyOrderedDictionary):
             aworksheet = worksheet.Worksheet(self, self._api, sheet_entry)
             yield (aworksheet.title, aworksheet)
 
+    @api.retry_on_server_error
     def _make_single_batch_request(self, method, params):
         request = {
             'requests': [{method: params}],

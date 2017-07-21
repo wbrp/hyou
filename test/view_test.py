@@ -17,6 +17,10 @@ from __future__ import (
 
 import unittest
 
+import googleapiclient.errors
+import mock
+import nose.tools
+
 import hyou.api
 import hyou.collection
 from hyou import py3
@@ -25,19 +29,41 @@ import hyou.util
 import http_mocks
 
 
+CREDENTIALS_FILE = 'unittest-sheets.json'
+
+
 class Dummy(object):
 
     def __str__(self):
         return py3.str_to_native_str('<dummy>', encoding='ascii')
 
 
-class WorksheetReadOnlyTest(unittest.TestCase):
+class ViewTestBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.api = hyou.api.API(
-            http_mocks.ReplayHttp('unittest-sheets.json'),
+            http_mocks.ReplayHttp(CREDENTIALS_FILE),
             discovery=False)
+
+
+class RetryTestBase(object):
+
+    sleep_patcher = mock.patch('time.sleep')  # Makes the tests run faster
+
+    @classmethod
+    def setUpClass(cls):
+        cls.sleep_patcher.start()
+        cls.error_http = http_mocks.ErrorHttp(
+            CREDENTIALS_FILE, hyou.api.NUM_RETRIES)
+        cls.api = hyou.api.API(cls.error_http, discovery=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.sleep_patcher.stop()
+
+
+class ViewReadOnlyTest(ViewTestBase):
 
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
@@ -152,7 +178,15 @@ class WorksheetReadOnlyTest(unittest.TestCase):
         self.assertEqual(5, self.view.cols)
 
 
-class WorksheetReadWriteTest(unittest.TestCase):
+class RetryViewReadOnlyTest(RetryTestBase, ViewReadOnlyTest):
+    """Same tests as above, but involving retries on server errors."""
+
+    def setUp(self):
+        self.error_http.request_num = 0
+        super(RetryViewReadOnlyTest, self).setUp()
+
+
+class ViewReadWriteTest(ViewTestBase):
 
     @classmethod
     def setUpClass(cls):
@@ -212,3 +246,18 @@ class WorksheetReadWriteTest(unittest.TestCase):
         self.view.refresh()
 
         self.assertEqual('honoka', self.view[0][0])
+
+
+class RetryViewReadWriteTest(RetryTestBase, ViewReadWriteTest):
+    """Same tests as above, but involving retries on server errors."""
+
+    def setUp(self):
+        self.error_http.request_num = 0
+        super(RetryViewReadWriteTest, self).setUp()
+
+    def test_too_many_errors(self):
+        # Quick way to make `ErrorHttp` return one more error
+        self.error_http.request_num = -1
+
+        with nose.tools.assert_raises(googleapiclient.errors.HttpError):
+            self.test_write()
