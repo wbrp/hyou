@@ -60,7 +60,20 @@ def main():
         assert view[1][1] == 'e'
 
         worksheet.refresh()
-        assert worksheet[3][4] == 'e'
+        assert worksheet.view()[3][4] == 'e'
+
+        data_view = worksheet.view()
+        data_view[0][0] = '1'
+        data_view[0][1] = '2'
+        data_view[0][2] = '=A1/B1'
+        data_view.commit()
+        # We need to refresh the view so the entered formula is replaced by
+        # the calculated value
+        data_view.refresh()
+
+        formula_view = worksheet.view(value_type='FORMULA')
+        assert data_view[0][2] == '0.5'
+        assert formula_view[0][2] == '=A1/B1'
 
     finally:
         spreadsheet.delete_worksheet(worksheet_title)
