@@ -40,6 +40,7 @@ class Collection(util.LazyOrderedDictionary):
         http = credentials.authorize(httplib2.Http())
         return cls(api.API(http, discovery=discovery))
 
+    @api.retry_on_server_error
     def create_spreadsheet(self, title, rows=1000, cols=26):
         body = {
             'title': title,
@@ -52,6 +53,7 @@ class Collection(util.LazyOrderedDictionary):
         spreadsheet[0].set_size(rows, cols)
         return spreadsheet
 
+    @api.retry_on_server_error
     def _spreadsheet_enumerator(self):
         response = self._api.drive.files().list(
             maxResults=1000,
@@ -62,6 +64,7 @@ class Collection(util.LazyOrderedDictionary):
             key = item['id']
             yield (key, spreadsheet.Spreadsheet(self._api, key, None))
 
+    @api.retry_on_server_error
     def _spreadsheet_constructor(self, key):
         entry = self._api.sheets.spreadsheets().get(
             spreadsheetId=key, includeGridData=False).execute()

@@ -16,14 +16,13 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals)
 
 import json
+import string
 
 import oauth2client.client
 import oauth2client.service_account
 import six
-import string
 
 from . import py3
-
 
 SCOPES = (
     'https://spreadsheets.google.com/feeds',

@@ -16,15 +16,16 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals)
 
 import hashlib
-import httplib2
 import json
 import logging
 import os
+import random
 
-from six.moves.urllib import parse
-
-from hyou import py3
+import googleapiclient.errors
+import httplib2
+import hyou.py3
 import hyou.util
+from six.moves.urllib import parse
 
 
 RECORDS_DIR = os.path.join(os.path.dirname(__file__), 'records')
@@ -41,7 +42,7 @@ def _canonicalize_uri(uri):
 
 def _canonicalize_json(body_json):
     # body_json can be bytes or str.
-    if isinstance(body_json, py3.str):
+    if isinstance(body_json, hyou.py3.str):
         json_str = body_json
     else:
         json_str = body_json.decode('utf-8')
@@ -62,7 +63,7 @@ def _load_records():
     records = {}
     for filename in sorted(os.listdir(RECORDS_DIR)):
         record_path = os.path.join(RECORDS_DIR, filename)
-        with py3.open(record_path, 'r', encoding='utf-8') as f:
+        with hyou.py3.open(record_path, 'r', encoding='utf-8') as f:
             record = json.load(f)
             record['_path'] = record_path
             body_bytes = (
@@ -90,7 +91,7 @@ class ReplayHttp(object):
         else:
             json_path = os.path.join(
                 os.path.dirname(__file__), 'creds', json_name)
-            with py3.open(json_path, 'r') as f:
+            with hyou.py3.open(json_path, 'r') as f:
                 credentials = hyou.util.parse_credentials(f.read())
             self._real_http = credentials.authorize(httplib2.Http())
         self._records = _load_records()
@@ -139,3 +140,21 @@ class ReplayHttp(object):
 
         # Do not return |response_headers| for consistency on replay.
         return (_make_ok_response(), response_body)
+
+
+class ErrorHttp(ReplayHttp):
+
+    def __init__(self, json_name, num_errors):
+        self.num_errors = num_errors
+        self.request_num = 0
+        super(ErrorHttp, self).__init__(json_name)
+
+    def request(self, uri, method='GET', body=None, *args, **kwargs):
+        self.request_num += 1
+        if self.request_num <= self.num_errors:
+            error_code = random.randint(500, 599)
+            response = httplib2.Response({'status': error_code})
+            raise googleapiclient.errors.HttpError(response, b'')
+        else:
+            return super(ErrorHttp, self).request(
+                uri, method, body, *args, **kwargs)

@@ -17,20 +17,45 @@ from __future__ import (
 
 import unittest
 
+import googleapiclient.errors
 import hyou.api
 import hyou.collection
 import hyou.util
+import mock
+import nose.tools
 
 import http_mocks
 
 
-class WorksheetReadOnlyTest(unittest.TestCase):
+CREDENTIALS_FILE = 'unittest-sheets.json'
+
+
+class WorksheetTestBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.api = hyou.api.API(
-            http_mocks.ReplayHttp('unittest-sheets.json'),
+            http_mocks.ReplayHttp(CREDENTIALS_FILE),
             discovery=False)
+
+
+class RetryTestBase(object):
+
+    sleep_patcher = mock.patch('time.sleep')  # Makes the tests run faster
+
+    @classmethod
+    def setUpClass(cls):
+        cls.sleep_patcher.start()
+        cls.error_http = http_mocks.ErrorHttp(
+            CREDENTIALS_FILE, hyou.api.NUM_RETRIES)
+        cls.api = hyou.api.API(cls.error_http, discovery=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.sleep_patcher.stop()
+
+
+class WorksheetReadOnlyTest(WorksheetTestBase):
 
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
@@ -59,13 +84,15 @@ class WorksheetReadOnlyTest(unittest.TestCase):
         self.worksheet1.view(start_col=1, end_col=0)
 
 
-class WorksheetReadWriteTest(unittest.TestCase):
+class RetryWorksheetReadOnlyTest(RetryTestBase, WorksheetReadOnlyTest):
+    """Same tests as above, but involving retries on server errors."""
 
-    @classmethod
-    def setUpClass(cls):
-        cls.api = hyou.api.API(
-            http_mocks.ReplayHttp('unittest-sheets.json'),
-            discovery=False)
+    def setUp(self):
+        self.error_http.request_num = 0
+        super(RetryWorksheetReadOnlyTest, self).setUp()
+
+
+class WorksheetReadWriteTest(WorksheetTestBase):
 
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
@@ -84,3 +111,18 @@ class WorksheetReadWriteTest(unittest.TestCase):
 
     def test_set_cols(self):
         self.worksheet1.cols = 5
+
+
+class RetryWorksheetReadWriteTest(RetryTestBase, WorksheetReadWriteTest):
+    """Same tests as above, but involving retries on server errors."""
+
+    def setUp(self):
+        self.error_http.request_num = 0
+        super(RetryWorksheetReadWriteTest, self).setUp()
+
+    def test_too_many_errors(self):
+        # Quick way to make `ErrorHttp` return one more error
+        self.error_http.request_num = -1
+
+        with nose.tools.assert_raises(googleapiclient.errors.HttpError):
+            self.test_set_size()

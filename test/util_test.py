@@ -20,10 +20,9 @@ from __future__ import (
 import os
 import unittest
 
-import mock
-
-from hyou import py3
 import hyou.util
+import hyou.py3
+import mock
 
 
 class MiscUtilsTest(unittest.TestCase):
@@ -55,19 +54,19 @@ class ParseCredentialsTest(unittest.TestCase):
     def test_login_user(self):
         json_path = os.path.join(
             os.path.dirname(__file__), 'creds', 'example-user.json')
-        with py3.open(json_path) as f:
+        with hyou.py3.open(json_path) as f:
             hyou.util.parse_credentials(f.read())
 
     def test_login_bot(self):
         json_path = os.path.join(
             os.path.dirname(__file__), 'creds', 'example-bot.json')
-        with py3.open(json_path) as f:
+        with hyou.py3.open(json_path) as f:
             hyou.util.parse_credentials(f.read())
 
     def test_login_invalid(self):
         json_path = os.path.join(
             os.path.dirname(__file__), 'creds', 'example-invalid.json')
-        with py3.open(json_path) as f:
+        with hyou.py3.open(json_path) as f:
             self.assertRaises(
                 ValueError, hyou.util.parse_credentials, f.read())
 
@@ -85,10 +84,10 @@ class LazyOrderedDictionaryTest(unittest.TestCase):
             ('A', 'apple'), ('B', 'banana'), ('C', 'cinamon')]
         # iter()
         it = iter(self.dict)
-        self.assertEqual('A', py3.next(it))
-        self.assertEqual('B', py3.next(it))
-        self.assertEqual('C', py3.next(it))
-        self.assertRaises(StopIteration, py3.next, it)
+        self.assertEqual('A', hyou.py3.next(it))
+        self.assertEqual('B', hyou.py3.next(it))
+        self.assertEqual('C', hyou.py3.next(it))
+        self.assertRaises(StopIteration, hyou.py3.next, it)
         # len()
         self.assertEqual(3, len(self.dict))
         # keys()

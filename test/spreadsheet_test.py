@@ -18,19 +18,44 @@ from __future__ import (
 import datetime
 import unittest
 
+import googleapiclient.errors
 import hyou.api
 import hyou.collection
+import mock
+import nose.tools
 
 import http_mocks
 
 
-class SpreadsheetReadOnlyTest(unittest.TestCase):
+CREDENTIALS_FILE = 'unittest-sheets.json'
+
+
+class SpreadsheetTestBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.api = hyou.api.API(
-            http_mocks.ReplayHttp('unittest-sheets.json'),
+            http_mocks.ReplayHttp(CREDENTIALS_FILE),
             discovery=False)
+
+
+class RetryTestBase(object):
+
+    sleep_patcher = mock.patch('time.sleep')  # Makes the tests run faster
+
+    @classmethod
+    def setUpClass(cls):
+        cls.sleep_patcher.start()
+        cls.error_http = http_mocks.ErrorHttp(
+            CREDENTIALS_FILE, hyou.api.NUM_RETRIES)
+        cls.api = hyou.api.API(cls.error_http, discovery=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.sleep_patcher.stop()
+
+
+class SpreadsheetReadOnlyTest(SpreadsheetTestBase):
 
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
@@ -94,13 +119,22 @@ class SpreadsheetReadOnlyTest(unittest.TestCase):
             isinstance(self.spreadsheet.updated, datetime.datetime))
 
 
-class SpreadsheetReadWriteTest(unittest.TestCase):
+class RetrySpreadsheetReadOnlyTest(RetryTestBase, SpreadsheetReadOnlyTest):
+    """Same tests as above, but involving retries on server errors."""
 
-    @classmethod
-    def setUpClass(cls):
-        cls.api = hyou.api.API(
-            http_mocks.ReplayHttp('unittest-sheets.json'),
-            discovery=False)
+    def setUp(self):
+        self.error_http.request_num = 0
+        super(RetrySpreadsheetReadOnlyTest, self).setUp()
+
+    def test_too_many_errors(self):
+        # Quick way to make `ErrorHttp` return one more error
+        self.error_http.request_num = -1
+
+        with nose.tools.assert_raises(googleapiclient.errors.HttpError):
+            self.test_refresh()
+
+
+class SpreadsheetReadWriteTest(SpreadsheetTestBase):
 
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
@@ -116,3 +150,11 @@ class SpreadsheetReadWriteTest(unittest.TestCase):
         self.assertEqual(2, worksheet.rows)
         self.assertEqual(8, worksheet.cols)
         self.spreadsheet.delete_worksheet('Sheet9')
+
+
+class RetrySpreadsheetReadWriteTest(RetryTestBase, SpreadsheetReadWriteTest):
+    """Same tests as above, but involving retries on server errors."""
+
+    def setUp(self):
+        self.error_http.request_num = 0
+        super(RetrySpreadsheetReadWriteTest, self).setUp()
