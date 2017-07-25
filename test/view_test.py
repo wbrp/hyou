@@ -18,13 +18,12 @@ from __future__ import (
 import unittest
 
 import googleapiclient.errors
-import mock
-import nose.tools
-
 import hyou.api
 import hyou.collection
-from hyou import py3
+import hyou.py3
 import hyou.util
+import mock
+import nose.tools
 
 import http_mocks
 
@@ -35,7 +34,7 @@ CREDENTIALS_FILE = 'unittest-sheets.json'
 class Dummy(object):
 
     def __str__(self):
-        return py3.str_to_native_str('<dummy>', encoding='ascii')
+        return hyou.py3.str_to_native_str('<dummy>', encoding='ascii')
 
 
 class ViewTestBase(unittest.TestCase):

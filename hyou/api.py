@@ -55,7 +55,7 @@ def _do_exp_backoff(func, max_num_retries):
             return func()
         except googleapiclient.errors.HttpError as err:
             if err.resp.status >= 500 and num_retry < max_num_retries:
-                upper_bound = 2 ^ num_retry
+                upper_bound = 2 ** num_retry
                 num_retry += 1
             else:
                 raise

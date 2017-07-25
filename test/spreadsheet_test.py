@@ -19,11 +19,10 @@ import datetime
 import unittest
 
 import googleapiclient.errors
-import mock
-import nose.tools
-
 import hyou.api
 import hyou.collection
+import mock
+import nose.tools
 
 import http_mocks
 

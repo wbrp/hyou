@@ -20,10 +20,9 @@ import logging
 import unittest
 
 import googleapiclient.errors
+import hyou.api
 import mock
 import nose.tools
-
-import hyou.api
 
 import http_mocks
 
