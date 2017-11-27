@@ -22,6 +22,9 @@ from . import util
 from . import worksheet
 
 
+SHEET_TYPE_GRID = 'GRID'
+
+
 class Spreadsheet(util.LazyOrderedDictionary):
 
     def __init__(self, api, key, entry):
@@ -107,6 +110,9 @@ class Spreadsheet(util.LazyOrderedDictionary):
     def _worksheet_enumerator(self):
         self._ensure_entry()
         for sheet_entry in self._entry['sheets']:
+            if sheet_entry['properties']['sheetType'] != SHEET_TYPE_GRID:
+                # "Object" worksheet, does not have any cells to manipulate
+                continue
             aworksheet = worksheet.Worksheet(self, self._api, sheet_entry)
             yield (aworksheet.title, aworksheet)
 
