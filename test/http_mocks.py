@@ -144,17 +144,46 @@ class ReplayHttp(object):
 
 class ErrorHttp(ReplayHttp):
 
+    rate_error_dict = {
+        'error': {
+            'code': 429,
+            'errors': [{
+                'domain': 'global',
+                'message': "Insufficient tokens for quota 'ReadGroup' "
+                           "and limit 'USER-100s' of service "
+                           "'sheets.googleapis.com' for consumer "
+                           "'project_number:1234'.",
+                'reason': 'rateLimitExceeded'
+            }],
+            'message': "Insufficient tokens for quota 'ReadGroup' and limit "
+                       "'USER-100s' of service 'sheets.googleapis.com' for "
+                       "consumer 'project_number:19957049059'.",
+            'status': 'RESOURCE_EXHAUSTED'}
+    }
+
     def __init__(self, json_name, num_errors):
         self.num_errors = num_errors
         self.request_num = 0
         super(ErrorHttp, self).__init__(json_name)
 
     def request(self, uri, method='GET', body=None, *args, **kwargs):
+        """Raise a random error until we reach `num_errors` calls."""
         self.request_num += 1
         if self.request_num <= self.num_errors:
-            error_code = random.randint(500, 599)
-            response = httplib2.Response({'status': error_code})
-            raise googleapiclient.errors.HttpError(response, b'')
+            random.choice([self.rate_error, self.server_error])()
         else:
             return super(ErrorHttp, self).request(
                 uri, method, body, *args, **kwargs)
+
+    @staticmethod
+    def rate_error():
+        error_code = 429
+        error_content = json.dumps(ErrorHttp.rate_error_dict).encode('utf8')
+        response = httplib2.Response({'status': error_code})
+        raise googleapiclient.errors.HttpError(response, error_content)
+
+    @staticmethod
+    def server_error():
+        error_code = random.randint(500, 599)
+        response = httplib2.Response({'status': error_code})
+        raise googleapiclient.errors.HttpError(response, b'')
