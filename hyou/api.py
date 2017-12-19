@@ -27,7 +27,9 @@ from . import schema
 SHEETS_API_DISCOVERY_URL = (
     'https://sheets.googleapis.com/$discovery/rest?version=v4')
 
-NUM_RETRIES = 4
+NUM_RETRIES = 5
+
+SHORT_TERM_RATE_ERROR = '100s'
 
 
 def retry_on_server_error(wrapped_func):
@@ -35,7 +37,6 @@ def retry_on_server_error(wrapped_func):
     Return a decorator to retry API calls which fail with 50x status codes,
     using an exponential backoff strategy with up to `NUM_RETRIES` retries.
     """
-
     @functools.wraps(wrapped_func)
     def wrapper(*args, **kwargs):
         partial_func = functools.partial(wrapped_func, *args, **kwargs)
@@ -44,8 +45,26 @@ def retry_on_server_error(wrapped_func):
     return wrapper
 
 
+def _is_retryable_err(http_error):
+    """
+    Return whether `http_error` is an error response for which we can re-try
+    the request.
+    """
+    if http_error.resp.status >= 500:
+        # Always retry for server errors
+        return True
+    elif http_error.resp.status == 429:
+        # Rate errors can either refer to the 100 seconds quota ("100s") or
+        # the one day quota ("1d"). We can retry the former.
+        return SHORT_TERM_RATE_ERROR in str(http_error)
+
+    return False
+
+
 def _do_exp_backoff(func, max_num_retries):
-    """Call `func` and perform exponential backoff for 50x errors."""
+    """
+    Call `func` and perform exponential backoff for server and rate errors.
+    """
     num_retry = 0
     upper_bound = 0
     while True:
@@ -54,7 +73,7 @@ def _do_exp_backoff(func, max_num_retries):
         try:
             return func()
         except googleapiclient.errors.HttpError as err:
-            if err.resp.status >= 500 and num_retry < max_num_retries:
+            if _is_retryable_err(err) and num_retry < max_num_retries:
                 upper_bound = 2 ** num_retry
                 num_retry += 1
             else:
