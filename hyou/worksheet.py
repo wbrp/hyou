@@ -46,7 +46,8 @@ class Worksheet(object):
             else:
                 raise exception.HyouRuntimeError('The sheet has been removed.')
 
-    def view(self, start_row=None, end_row=None, start_col=None, end_col=None):
+    def view(self, start_row=None, end_row=None,
+             start_col=None, end_col=None, fetch_params=None):
         start_row, end_row, _ = slice(start_row, end_row).indices(self.rows)
         start_col, end_col, _ = slice(start_col, end_col).indices(self.cols)
         if start_row > end_row:
@@ -56,7 +57,9 @@ class Worksheet(object):
         return view.View(
             self, self._api,
             start_row=start_row, end_row=end_row,
-            start_col=start_col, end_col=end_col)
+            start_col=start_col, end_col=end_col,
+            fetch_params=fetch_params
+        )
 
     def set_size(self, rows, cols):
         util.check_type(rows, six.integer_types)
