@@ -71,7 +71,9 @@ def main():
         # the calculated value
         data_view.refresh()
 
-        formula_view = worksheet.view(value_type='FORMULA')
+        formula_view = worksheet.view(
+            fetch_params=dict(valueRenderOption='FORMULA')
+        )
         assert data_view[0][2] == '0.5'
         assert formula_view[0][2] == '=A1/B1'
 

@@ -22,15 +22,10 @@ from . import py3
 from . import util
 
 
-DEFAULT_MAJOR_DIMENSION = 'ROWS'
-DEFAULT_VALUE_TYPE = 'FORMATTED_VALUE'
-DEFAULT_DATE_TYPE = 'FORMATTED_STRING'
-
-
 class View(util.CustomMutableFixedList):
 
-    def __init__(self, worksheet, api, start_row, end_row,
-                 start_col, end_col, **kwargs):
+    def __init__(self, worksheet, api, start_row, end_row, start_col, end_col,
+                 fetch_params=None):
         self._worksheet = worksheet
         self._api = api
         self._start_row = start_row
@@ -43,11 +38,7 @@ class View(util.CustomMutableFixedList):
         self._input_value_map = {}
         self._cells_fetched = False
         self._queued_updates = []
-        self._major_dimension = kwargs.get(
-            'major_dimension', DEFAULT_MAJOR_DIMENSION
-        )
-        self._value_type = kwargs.get('value_type', DEFAULT_VALUE_TYPE)
-        self._date_type = kwargs.get('date_type', DEFAULT_DATE_TYPE)
+        self._fetch_params = fetch_params or {}
 
     def refresh(self):
         self._input_value_map.clear()
@@ -64,9 +55,7 @@ class View(util.CustomMutableFixedList):
         response = self._api.sheets.spreadsheets().values().get(
             spreadsheetId=self._worksheet._spreadsheet.key,
             range=py3.str_to_native_str(range_str, encoding='utf-8'),
-            majorDimension=self._major_dimension,
-            valueRenderOption=self._value_type,
-            dateTimeRenderOption=self._date_type).execute()
+            **self._fetch_params).execute()
         self._input_value_map = {}
         for i, row in enumerate(response.get('values', [])):
             index_row = self._start_row + i
