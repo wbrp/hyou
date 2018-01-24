@@ -125,3 +125,25 @@ class Spreadsheet(util.LazyOrderedDictionary):
         response = self._api.sheets.spreadsheets().batchUpdate(
             spreadsheetId=self.key, body=request).execute()
         return response['updatedSpreadsheet']
+
+
+    @api.retry_on_server_error
+    def batch_get_worksheets(self, sheets, fetch_params=None):
+        fetch_params = fetch_params or {}
+        fetch_params['prettyPrint'] = False  # Save space
+        request = {
+            'dataFilters': [],
+            'includeGridData': True,
+        }
+        for sheet in sheets:
+            grid_range = {
+                'sheetId': sheet['id']
+            }
+            request['dataFilters'].append({'gridRange': grid_range})
+
+        response = self._api.sheets.spreadsheets().getByDataFilter(
+            spreadsheetId=self.key, body=request, **fetch_params
+        ).execute()
+
+        # TODO: create views depending on response
+        return
