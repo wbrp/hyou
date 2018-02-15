@@ -27,7 +27,9 @@ from . import schema
 SHEETS_API_DISCOVERY_URL = (
     'https://sheets.googleapis.com/$discovery/rest?version=v4')
 
-NUM_RETRIES = 5
+NUM_RETRIES = 8
+# Last retry happens after (2^1 + ... + 2^8) * 0.5 = 255.5 seconds on average
+# This should make failures because of rate limits very rare.
 
 SHORT_TERM_RATE_ERROR = '100s'
 
@@ -66,16 +68,15 @@ def _do_exp_backoff(func, max_num_retries):
     Call `func` and perform exponential backoff for server and rate errors.
     """
     num_retry = 0
-    upper_bound = 0
     while True:
-        backoff = random.random() * upper_bound
-        time.sleep(backoff)
         try:
             return func()
         except googleapiclient.errors.HttpError as err:
             if _is_retryable_err(err) and num_retry < max_num_retries:
-                upper_bound = 2 ** num_retry
                 num_retry += 1
+                upper_bound = 2 ** num_retry
+                backoff = random.random() * upper_bound
+                time.sleep(backoff)
             else:
                 raise
 
