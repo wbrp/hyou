@@ -33,6 +33,7 @@ class Spreadsheet(util.LazyOrderedDictionary):
         self._key = str(key)
         self._entry = entry
         self._updated = None
+        self._properties = None
 
     def __repr__(self):
         return str('Spreadsheet(key=%r)') % (self.key,)
@@ -103,7 +104,12 @@ class Spreadsheet(util.LazyOrderedDictionary):
                 response['modifiedDate'], '%Y-%m-%dT%H:%M:%S.%fZ')
         return self._updated
 
-
+    @property
+    @api.retry_on_server_error
+    def properties(self):
+        if not self._properties:
+            self._properties = self._api.drive.properties().list(fileId=self.key).execute()
+        return self._properties
 
 
     def _ensure_entry(self):
