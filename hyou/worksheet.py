@@ -61,6 +61,22 @@ class Worksheet(object):
             fetch_params=fetch_params
         )
 
+    def complex_view(self, start_row=None, end_row=None,
+             start_col=None, end_col=None, fetch_params=None):
+        start_row, end_row, _ = slice(start_row, end_row).indices(self.rows)
+        start_col, end_col, _ = slice(start_col, end_col).indices(self.cols)
+        if start_row > end_row:
+            start_row = end_row
+        if start_col > end_col:
+            start_col = end_col
+        return view.ComplexView(
+            self, self._api,
+            start_row=start_row, end_row=end_row,
+            start_col=start_col, end_col=end_col,
+            fetch_params=fetch_params
+        )
+
+
     def set_size(self, rows, cols):
         util.check_type(rows, six.integer_types)
         util.check_type(cols, six.integer_types)

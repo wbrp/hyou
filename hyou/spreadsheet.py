@@ -103,6 +103,9 @@ class Spreadsheet(util.LazyOrderedDictionary):
                 response['modifiedDate'], '%Y-%m-%dT%H:%M:%S.%fZ')
         return self._updated
 
+
+
+
     def _ensure_entry(self):
         if self._entry is None:
             self.refresh()
@@ -127,23 +130,65 @@ class Spreadsheet(util.LazyOrderedDictionary):
         return response['updatedSpreadsheet']
 
 
-    @api.retry_on_server_error
-    def batch_get_worksheets(self, sheets, fetch_params=None):
+
+    def get_by_data_filter(self,sheets, fetch_params=None):
         fetch_params = fetch_params or {}
         fetch_params['prettyPrint'] = False  # Save space
         request = {
             'dataFilters': [],
             'includeGridData': True,
         }
+        fetch_data = {}
         for sheet in sheets:
+            fetch_data[sheet['id']] = sheet
             grid_range = {
                 'sheetId': sheet['id']
             }
             request['dataFilters'].append({'gridRange': grid_range})
 
-        response = self._api.sheets.spreadsheets().getByDataFilter(
-            spreadsheetId=self.key, body=request, **fetch_params
+        response = api.sheets.spreadsheets().getByDataFilter(
+            spreadsheetId=key, body=request, **fetch_params
         ).execute()
 
-        # TODO: create views depending on response
-        return
+    @classmethod
+    def precache_worksheets(cls, api, key, sheets, fetch_params=None):
+        fetch_params = fetch_params or {}
+        fetch_params['prettyPrint'] = False  # Save space
+        request = {
+            'dataFilters': [],
+            'includeGridData': True,
+        }
+        requested_range = {}
+        for sheet in sheets:
+            grid_range = {}
+
+            grid_range['sheetId'] = sheet['sheetId']
+            requested_range[sheet['sheetId']] = sheet
+
+            if sheet.get('start_row') is not None:
+                grid_range['startRowIndex'] = sheet['start_row']
+            if sheet.get('end_row') is not None:
+                grid_range['endRowIndex'] = sheet['end_row']
+            if sheet.get('start_col') is not None:
+                grid_range['startColumnIndex'] = sheet['start_col']
+            if sheet.get('end_col') is not None:
+                grid_range['endColumnIndex'] = sheet['end_col']
+
+            request['dataFilters'].append({'gridRange': grid_range})
+
+        response = api.sheets.spreadsheets().getByDataFilter(
+            spreadsheetId=key, body=request, **fetch_params
+        ).execute()
+
+        for sheet in response['sheets']:
+            sheet['fetched_properties'] = requested_range[sheet['properties']['sheetId']]
+            end_row = sheet['properties']['gridProperties']['rowCount']
+            end_col = sheet['properties']['gridProperties']['columnCount']
+
+            sheet['fetched_properties'].setdefault('start_row', 0)
+            sheet['fetched_properties'].setdefault('start_col', 0)
+            sheet['fetched_properties'].setdefault('end_row', end_row)
+            sheet['fetched_properties'].setdefault('end_col', end_col)
+
+        return cls(api, key, response)
+

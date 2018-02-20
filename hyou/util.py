@@ -23,7 +23,7 @@ import oauth2client.service_account
 import six
 
 from . import py3
-
+MAGIC_NUMBER = 64
 SCOPES = (
     'https://spreadsheets.google.com/feeds',
     'https://www.googleapis.com/auth/drive',
@@ -44,6 +44,11 @@ def format_column_address(index_column):
         index_column = index_column // 26 - 1
     return ''.join(reversed(letters))
 
+def column_label_to_number(column_label):
+    col = 0
+    for i, c in enumerate(reversed(column_label)):
+        col += (ord(c) - MAGIC_NUMBER) * (26 ** i)
+    return col
 
 def format_range_a1_notation(
         worksheet_title, start_row, end_row, start_col, end_col):

@@ -139,6 +139,59 @@ class View(util.CustomMutableFixedList):
         return self._end_col
 
 
+class ComplexView(View):
+
+    def __init__(self, *args, **kwargs):
+        super(ComplexView, self).__init__(*args, **kwargs)
+
+    def _get_prefetched_data(self):
+        # TODO: Also check the fetch params to make sure they are the same!
+        if 'fetched_properties' not in self._worksheet._entry:
+            return None
+
+        requested_range = (self._start_row, self._end_row, self._start_col, self._end_col)
+        fp = self._worksheet._entry['fetched_properties']
+        existing_range = (fp['start_row'], fp['end_row'], fp['start_col'], fp['end_col'])
+        if requested_range == existing_range:
+            return self._worksheet._entry['data'][0]
+        else:
+            return None
+
+    @api.retry_on_server_error
+    def _ensure_cells_fetched(self):
+        if self._cells_fetched:
+            return
+        self._input_value_map = {}
+
+        cached_data = self._get_prefetched_data()
+        if cached_data:
+            for i, row in enumerate(cached_data['rowData']):
+                index_row = self._start_row + i
+                for j, value in enumerate(row['values']):
+                    index_col = self._start_col + j
+                    self._input_value_map.setdefault((index_row, index_col), value)
+        else:
+            range_str = util.format_range_a1_notation(
+                self._worksheet.title, self._start_row, self._end_row,
+                self._start_col, self._end_col)
+            response = self._api.sheets.spreadsheets().values().get(
+                spreadsheetId=self._worksheet._spreadsheet.key,
+                range=py3.str_to_native_str(range_str, encoding='utf-8'),
+                **self._fetch_params).execute()
+
+            for i, row in enumerate(response.get('values', [])):
+                index_row = self._start_row + i
+                for j, value in enumerate(row):
+                    index_col = self._start_col + j
+                    self._input_value_map.setdefault((index_row, index_col), value)
+
+        self._cells_fetched = True
+
+    @api.retry_on_server_error
+    def commit(self):
+        raise Exception('Not supported')
+
+
 class ViewRow(util.CustomMutableFixedList):
 
     def __init__(self, view, row, start_col, end_col):
@@ -164,6 +217,7 @@ class ViewRow(util.CustomMutableFixedList):
             col = self._start_col + index
         if not (self._start_col <= col < self._end_col):
             raise IndexError('Column %d is out of range.' % col)
+
         if (self._row, col) not in self._view._input_value_map:
             self._view._ensure_cells_fetched()
         return self._view._input_value_map.get((self._row, col), '')
