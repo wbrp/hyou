@@ -136,26 +136,6 @@ class Spreadsheet(util.LazyOrderedDictionary):
         return response['updatedSpreadsheet']
 
 
-
-    def get_by_data_filter(self,sheets, fetch_params=None):
-        fetch_params = fetch_params or {}
-        fetch_params['prettyPrint'] = False  # Save space
-        request = {
-            'dataFilters': [],
-            'includeGridData': True,
-        }
-        fetch_data = {}
-        for sheet in sheets:
-            fetch_data[sheet['id']] = sheet
-            grid_range = {
-                'sheetId': sheet['id']
-            }
-            request['dataFilters'].append({'gridRange': grid_range})
-
-        response = api.sheets.spreadsheets().getByDataFilter(
-            spreadsheetId=key, body=request, **fetch_params
-        ).execute()
-
     @classmethod
     def precache_worksheets(cls, api, key, sheets, fetch_params=None):
         fetch_params = fetch_params or {}
