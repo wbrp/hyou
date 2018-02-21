@@ -99,7 +99,7 @@ class Spreadsheet(util.LazyOrderedDictionary):
     @api.retry_on_server_error
     def updated(self):
         if not self._updated:
-            response = self._api.drive.files().get(fileId=self.key).execute()
+            response = self._api.drive.files().get(fileId=self.key, fields='modifiedDate').execute()
             self._updated = datetime.datetime.strptime(
                 response['modifiedDate'], '%Y-%m-%dT%H:%M:%S.%fZ')
         return self._updated
