@@ -167,7 +167,7 @@ class ComplexView(View):
         if cached_data:
             for i, row in enumerate(cached_data['rowData']):
                 index_row = self._start_row + i
-                for j, value in enumerate(row['values']):
+                for j, value in enumerate(row.get('values', [])):
                     index_col = self._start_col + j
                     self._input_value_map.setdefault((index_row, index_col), value)
         else:
