@@ -24,7 +24,7 @@ from .worksheet import Worksheet
 login = Collection.login
 
 
-__version__ = '3.0b2'
+__version__ = '3.1.0'
 
 __all__ = [
     'Collection',

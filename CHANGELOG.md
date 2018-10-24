@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.1.0 (2018-10-24)
+
+- Use `google-auth` in place of `oauth2client`
+
 3.0.0 (2017-MM-DD)
 
 - Added Python 3.3+ support.
