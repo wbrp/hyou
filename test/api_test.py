@@ -32,7 +32,7 @@ CREDENTIALS_FILE = 'unittest-collection.json'
 
 @contextlib.contextmanager
 def suppress_oauth2client_warnings():
-    """Suppresses warnings from oauth2client 4+."""
+    """Suppresses warnings from oauth2client not being available"""
     logger = logging.getLogger('googleapiclient.discovery_cache')
     logger.setLevel(logging.ERROR)
     try:
