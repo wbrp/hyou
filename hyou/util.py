@@ -18,8 +18,8 @@ from __future__ import (
 import json
 import string
 
-import oauth2client.client
-import oauth2client.service_account
+import google.oauth2.credentials
+import google.oauth2.service_account
 import six
 
 from . import py3
@@ -58,12 +58,12 @@ def format_range_a1_notation(
 def parse_credentials(json_text):
     json_data = json.loads(json_text)
     if '_module' in json_data:
-        return oauth2client.client.Credentials.new_from_json(
-            json_text)
+        return google.oauth2.credentials.Credentials.from_authorized_user_info(
+            json_data)
     elif 'private_key' in json_data:
         return (
-            oauth2client.service_account.ServiceAccountCredentials
-            .from_json_keyfile_dict(
+            google.oauth2.service_account.Credentials
+            .from_service_account_info(
                 json_data,
                 scopes=SCOPES))
     raise ValueError('unrecognized credential format')
@@ -210,6 +210,8 @@ class CustomMutableFixedList(object):
             if value == find_value:
                 return True
         return False
+
+    __hash__ = None
 
     def count(self, find_value):
         result = 0

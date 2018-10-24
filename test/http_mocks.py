@@ -21,6 +21,7 @@ import logging
 import os
 import random
 
+import google_auth_httplib2
 import googleapiclient.errors
 import httplib2
 import hyou.py3
@@ -93,7 +94,7 @@ class ReplayHttp(object):
                 os.path.dirname(__file__), 'creds', json_name)
             with hyou.py3.open(json_path, 'r') as f:
                 credentials = hyou.util.parse_credentials(f.read())
-            self._real_http = credentials.authorize(httplib2.Http())
+            self._real_http = google_auth_httplib2.AuthorizedHttp(credentials)
         self._records = _load_records()
 
     def request(self, uri, method='GET', body=None, *args, **kwargs):

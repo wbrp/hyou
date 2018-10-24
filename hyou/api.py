@@ -84,15 +84,17 @@ def _do_exp_backoff(func, max_num_retries):
 class API(object):
 
     @retry_on_server_error
-    def __init__(self, http, discovery=False):
+    def __init__(self, http=None, credentials=None, discovery=False):
+        if not (http or credentials):
+            raise ValueError('Either http or credentials have to be provided')
         if discovery:
             self.sheets = googleapiclient.discovery.build(
-                'sheets', 'v4', http=http,
+                'sheets', 'v4', http=http, credentials=credentials,
                 discoveryServiceUrl=SHEETS_API_DISCOVERY_URL)
             self.drive = googleapiclient.discovery.build(
-                'drive', 'v2', http=http)
+                'drive', 'v2', http=http, credentials=credentials)
         else:
             self.sheets = googleapiclient.discovery.build_from_document(
-                schema.SHEETS_V4, http=http)
+                schema.SHEETS_V4, http=http, credentials=credentials)
             self.drive = googleapiclient.discovery.build_from_document(
-                schema.DRIVE_V2, http=http)
+                schema.DRIVE_V2, http=http, credentials=credentials)
