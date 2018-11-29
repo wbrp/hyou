@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.1.1 (2018-11-29)
+
+- Retry for a maximum amount of time instead of a maximum number of requests.
+
 3.1.0 (2018-10-24)
 
 - Use `google-auth` in place of `oauth2client`
