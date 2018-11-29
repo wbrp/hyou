@@ -16,6 +16,7 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals)
 
 import datetime
+import time
 import unittest
 
 import googleapiclient.errors
@@ -41,13 +42,15 @@ class SpreadsheetTestBase(unittest.TestCase):
 
 class RetryTestBase(object):
 
-    sleep_patcher = mock.patch('time.sleep')  # Makes the tests run faster
+    sleep_patcher = mock.patch('time.sleep')
 
     @classmethod
     def setUpClass(cls):
         cls.sleep_patcher.start()
+        sleep_mock = time.sleep
+        # Use an ErrorHttp that returns errors up until the last retry
         cls.error_http = http_mocks.ErrorHttp(
-            CREDENTIALS_FILE, hyou.api.NUM_RETRIES)
+            CREDENTIALS_FILE,  hyou.api.MAX_WAIT_TIME-1, sleep_mock)
         cls.api = hyou.api.API(cls.error_http, discovery=False)
 
     @classmethod
@@ -123,15 +126,17 @@ class RetrySpreadsheetReadOnlyTest(RetryTestBase, SpreadsheetReadOnlyTest):
     """Same tests as above, but involving retries on server errors."""
 
     def setUp(self):
-        self.error_http.request_num = 0
         super(RetrySpreadsheetReadOnlyTest, self).setUp()
+        self.error_http.sleep_mock.reset_mock()
 
     def test_too_many_errors(self):
-        # Quick way to make `ErrorHttp` return one more error
-        self.error_http.request_num = -1
+        original_max_sleep = self.error_http.max_sleep
+        self.error_http.max_sleep += 10
 
         with nose.tools.assert_raises(googleapiclient.errors.HttpError):
             self.test_refresh()
+
+        self.error_http.max_sleep = original_max_sleep
 
 
 class SpreadsheetReadWriteTest(SpreadsheetTestBase):
@@ -156,5 +161,5 @@ class RetrySpreadsheetReadWriteTest(RetryTestBase, SpreadsheetReadWriteTest):
     """Same tests as above, but involving retries on server errors."""
 
     def setUp(self):
-        self.error_http.request_num = 0
+        self.error_http.sleep_mock.reset_mock()
         super(RetrySpreadsheetReadWriteTest, self).setUp()
