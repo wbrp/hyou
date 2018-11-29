@@ -27,10 +27,8 @@ from . import schema
 SHEETS_API_DISCOVERY_URL = (
     'https://sheets.googleapis.com/$discovery/rest?version=v4')
 
-NUM_RETRIES = 8
-# Last retry happens after (2^1 + ... + 2^8) * 0.5 = 255.5 seconds on average
-# This should make failures because of rate limits very rare.
-
+# Maximum amount of time we want to spend retrying failed requests.
+MAX_WAIT_TIME = 105
 SHORT_TERM_RATE_ERROR = '100s'
 
 
@@ -42,7 +40,7 @@ def retry_on_server_error(wrapped_func):
     @functools.wraps(wrapped_func)
     def wrapper(*args, **kwargs):
         partial_func = functools.partial(wrapped_func, *args, **kwargs)
-        return _do_exp_backoff(partial_func, NUM_RETRIES)
+        return _do_exp_backoff(partial_func, MAX_WAIT_TIME)
 
     return wrapper
 
@@ -55,7 +53,8 @@ def _is_retryable_err(http_error):
     if http_error.resp.status >= 500:
         # Always retry for server errors
         return True
-    elif http_error.resp.status == 429:
+
+    if http_error.resp.status == 429:
         # Rate errors can either refer to the 100 seconds quota ("100s") or
         # the one day quota ("1d"). We can retry the former.
         return SHORT_TERM_RATE_ERROR in str(http_error)
@@ -63,20 +62,26 @@ def _is_retryable_err(http_error):
     return False
 
 
-def _do_exp_backoff(func, max_num_retries):
+def _do_exp_backoff(func, max_wait_time):
     """
     Call `func` and perform exponential backoff for server and rate errors.
     """
     num_retry = 0
+    total_wait_time = 0.0
+    do_wait = True
     while True:
         try:
             return func()
         except googleapiclient.errors.HttpError as err:
-            if _is_retryable_err(err) and num_retry < max_num_retries:
+            if do_wait and _is_retryable_err(err):
                 num_retry += 1
                 upper_bound = 2 ** num_retry
                 backoff = random.random() * upper_bound
+                if total_wait_time + backoff > max_wait_time:
+                    backoff = max_wait_time - total_wait_time
+                    do_wait = False
                 time.sleep(backoff)
+                total_wait_time += backoff
             else:
                 raise
 

@@ -162,15 +162,18 @@ class ErrorHttp(ReplayHttp):
             'status': 'RESOURCE_EXHAUSTED'}
     }
 
-    def __init__(self, json_name, num_errors):
-        self.num_errors = num_errors
-        self.request_num = 0
+    def __init__(self, json_name, max_sleep, sleep_mock):
+        self.max_sleep = max_sleep
+        self.sleep_mock = sleep_mock
         super(ErrorHttp, self).__init__(json_name)
 
     def request(self, uri, method='GET', body=None, *args, **kwargs):
-        """Raise a random error until we reach `num_errors` calls."""
-        self.request_num += 1
-        if self.request_num <= self.num_errors:
+        """
+        Raise a random error until `self.sleep_mock` has been called for more
+        than `self.max_sleep` seconds in total.
+        """
+        sleep_time = sum(call[0][0] for call in self.sleep_mock.call_args_list)
+        if sleep_time <= self.max_sleep:
             random.choice([self.rate_error, self.server_error])()
         else:
             return super(ErrorHttp, self).request(

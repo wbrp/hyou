@@ -17,6 +17,7 @@ from __future__ import (
 
 import contextlib
 import logging
+import time
 import unittest
 
 import googleapiclient.errors
@@ -55,18 +56,26 @@ class APITest(unittest.TestCase):
                 discovery=True)
 
     def test_discovery_retry_on_error(self):
-        patcher = mock.patch('time.sleep')  # Makes the following much faster
-        patcher.start()
+        sleep_patcher = mock.patch('time.sleep')
+        sleep_patcher.start()
+        sleep_mock = time.sleep
 
         with suppress_oauth2client_warnings():
+            # This should suceed as we wait one second longer than `ErrorHttp`
+            # will return errors
             hyou.api.API(
                 http_mocks.ErrorHttp(
-                    CREDENTIALS_FILE, num_errors=hyou.api.NUM_RETRIES),
+                    CREDENTIALS_FILE, hyou.api.MAX_WAIT_TIME-1, sleep_mock),
                 discovery=True)
+
+            sleep_mock.reset_mock()
+            # Conversely, this constructor should fail as `ErrorHttp` will
+            # return error for a longer time than we're willing to wait
             with nose.tools.assert_raises(googleapiclient.errors.HttpError):
                 hyou.api.API(
                     http_mocks.ErrorHttp(
-                        CREDENTIALS_FILE, num_errors=hyou.api.NUM_RETRIES+1),
+                        CREDENTIALS_FILE, hyou.api.MAX_WAIT_TIME+1, sleep_mock
+                    ),
                     discovery=True)
 
-        patcher.stop()
+        sleep_patcher.stop()
