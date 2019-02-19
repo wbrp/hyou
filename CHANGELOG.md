@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.1.2 (2019-02-19)
+
+- Increase maximum retry time to 200 seconds.
+
 3.1.1 (2018-11-29)
 
 - Retry for a maximum amount of time instead of a maximum number of requests.
