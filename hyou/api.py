@@ -28,7 +28,7 @@ SHEETS_API_DISCOVERY_URL = (
     'https://sheets.googleapis.com/$discovery/rest?version=v4')
 
 # Maximum amount of time we want to spend retrying failed requests.
-MAX_WAIT_TIME = 105
+MAX_WAIT_TIME = 200
 SHORT_TERM_RATE_ERROR = '100s'
 
 
