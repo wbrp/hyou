@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.1.3 (2019-02-27)
+
+- Add read timeouts to retryable exceptions.
+
 3.1.2 (2019-02-19)
 
 - Increase maximum retry time to 200 seconds.
