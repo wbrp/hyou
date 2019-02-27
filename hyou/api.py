@@ -17,6 +17,8 @@ from __future__ import (
 
 import functools
 import random
+import socket
+import ssl
 import time
 
 import googleapiclient.discovery
@@ -45,6 +47,30 @@ def retry_on_server_error(wrapped_func):
     return wrapper
 
 
+class _Backoff():
+
+    """Helper class to keep state when doing exponential backoff."""
+
+    def __init__(self, max_wait_time):
+        self.max_wait_time = max_wait_time
+        self.num_retry = 0
+        self.total_wait_time = 0.0
+        self.do_wait = True
+
+    def backoff(self, exc):
+        if self.do_wait:
+            self.num_retry += 1
+            upper_bound = 2 ** self.num_retry
+            backoff = random.random() * upper_bound
+            if self.total_wait_time + backoff > self.max_wait_time:
+                backoff = self.max_wait_time - self.total_wait_time
+                self.do_wait = False
+            time.sleep(backoff)
+            self.total_wait_time += backoff
+        else:
+            raise exc
+
+
 def _is_retryable_err(http_error):
     """
     Return whether `http_error` is an error response for which we can re-try
@@ -64,26 +90,22 @@ def _is_retryable_err(http_error):
 
 def _do_exp_backoff(func, max_wait_time):
     """
-    Call `func` and perform exponential backoff for server and rate errors.
+    Call `func` and perform exponential backoff for timouts, server and rate
+    errors.
     """
-    num_retry = 0
-    total_wait_time = 0.0
-    do_wait = True
+    backoff = _Backoff(max_wait_time)
     while True:
         try:
             return func()
         except googleapiclient.errors.HttpError as err:
-            if do_wait and _is_retryable_err(err):
-                num_retry += 1
-                upper_bound = 2 ** num_retry
-                backoff = random.random() * upper_bound
-                if total_wait_time + backoff > max_wait_time:
-                    backoff = max_wait_time - total_wait_time
-                    do_wait = False
-                time.sleep(backoff)
-                total_wait_time += backoff
+            if _is_retryable_err(err):
+                backoff.backoff(err)
             else:
                 raise
+        # Timeouts are raised as `SSLError` in Python < 3.2
+        # https://bugs.python.org/issue10272
+        except (socket.timeout, ssl.SSLError) as exc:
+            backoff.backoff(exc)
 
 
 class API(object):
