@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.1.4 (2019-04-04)
+
+- Relax requirements in `setup.py`.
+
 3.1.3 (2019-02-27)
 
 - Add read timeouts to retryable exceptions.
