@@ -16,6 +16,13 @@ import os
 
 import setuptools
 
+REQUIRED = [
+    'google-api-python-client>=1.7.0,<2',
+    'google-auth>=1.6.0,<2',
+    'google-auth-httplib2>=0.0.3,<1',
+    'six>=1.11.0'
+]
+
 
 def read_file(name):
     with open(os.path.join(os.path.dirname(__file__), name), 'r') as f:
@@ -34,8 +41,7 @@ setuptools.setup(
     scripts=[
         'tools/generate_oauth2_credentials.py',
     ],
-    install_requires=read_file('requirements.txt').splitlines(),
-    tests_require=read_file('requirements_dev.txt').splitlines(),
+    install_requires=REQUIRED,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',
@@ -44,6 +50,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: Apache Software License',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
