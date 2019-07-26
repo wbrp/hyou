@@ -27,7 +27,7 @@ def main():
         os.path.dirname(__file__), 'creds', 'unittest-sheets.json')
     collection = hyou.login(json_path)
 
-    spreadsheet = collection['1hxNAHH-DUWgFcC603mFARGYOeKUwiRq56VsHOJSA5Z0']
+    spreadsheet = collection['1AJSfI3vDtb0CI4EPO9UnJ3Sg1D5ii33_t4qI2jl59SQ']
 
     print('Running tests with %s ...' % spreadsheet.url)
 

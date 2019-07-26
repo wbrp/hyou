@@ -70,7 +70,7 @@ class ViewReadOnlyTest(ViewTestBase):
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
         self.spreadsheet = self.collection[
-            '18OLN5A2SSKAeYLXw4SnZxU1yRJnMdf_ZCjc0D2UdhX8']
+            '1ZeOz9HFMJaS4GhZNAdr1Lb-326zVF0c7IG1RL9btlVI']
         self.worksheet1 = self.spreadsheet['Sheet1']
         self.view = self.worksheet1.view()
 
@@ -199,7 +199,7 @@ class ViewReadWriteTest(ViewTestBase):
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
         self.spreadsheet = self.collection[
-            '1z5eYrVoLP-RUWdzeqUShRc2VPFX0SUCTlHMmUS0K8Lo']
+            '1IWcyjDQhL0X8wdb1BZFAigJJ7WpBpmbgDrw1zQxyUHI']
         self.worksheet1 = self.spreadsheet['Sheet1']
         self.view = self.worksheet1.view()
 
