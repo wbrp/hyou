@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.2.0 (2019-07-26)
+
+- Add `clear` method to `view.View`.
+
 3.1.4 (2019-04-04)
 
 - Relax requirements in `setup.py`.
