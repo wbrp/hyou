@@ -77,6 +77,9 @@ def main():
         assert data_view[0][2] == '0.5'
         assert formula_view[0][2] == '=A1/B1'
 
+        data_view.clear()
+        assert all(value == '' for row in data_view for value in row)
+
     finally:
         spreadsheet.delete_worksheet(worksheet_title)
         print('Removed %s' % worksheet_title)
