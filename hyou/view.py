@@ -66,6 +66,12 @@ class View(util.CustomMutableFixedList):
 
     @api.retry_on_server_error
     def clear(self):
+        """
+        Clear all values of this view.
+
+        All other properties of the contained cells (such as formatting, data
+        validation etc.) are left unmodified.
+        """
         params = {
             'spreadsheetId': self._worksheet._spreadsheet.key,
             'range': util.format_range_a1_notation(
