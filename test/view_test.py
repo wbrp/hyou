@@ -283,7 +283,10 @@ class ViewClearTest(ViewTestBase):
 
     def test_clear(self):
         data = [
-            ['%s-%s' % (row_idx, cell_idx) for cell_idx in range(self.view.cols)]
+            [
+                '%s-%s' % (row_idx, cell_idx)
+                for cell_idx in range(self.view.cols)
+            ]
             for row_idx in range(self.view.rows)
         ]
         self.view[:] = data
