@@ -70,7 +70,7 @@ class ViewReadOnlyTest(ViewTestBase):
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
         self.spreadsheet = self.collection[
-            '18OLN5A2SSKAeYLXw4SnZxU1yRJnMdf_ZCjc0D2UdhX8']
+            '1ZeOz9HFMJaS4GhZNAdr1Lb-326zVF0c7IG1RL9btlVI']
         self.worksheet1 = self.spreadsheet['Sheet1']
         self.view = self.worksheet1.view()
 
@@ -199,7 +199,7 @@ class ViewReadWriteTest(ViewTestBase):
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
         self.spreadsheet = self.collection[
-            '1z5eYrVoLP-RUWdzeqUShRc2VPFX0SUCTlHMmUS0K8Lo']
+            '1IWcyjDQhL0X8wdb1BZFAigJJ7WpBpmbgDrw1zQxyUHI']
         self.worksheet1 = self.spreadsheet['Sheet1']
         self.view = self.worksheet1.view()
 
@@ -265,3 +265,31 @@ class RetryViewReadWriteTest(RetryTestBase, ViewReadWriteTest):
             self.test_write()
 
         self.error_http.max_sleep = original_max_sleep
+
+
+class ViewClearTest(ViewTestBase):
+
+    NUM_COLS = 10
+    NUM_ROWS = 10
+
+    def setUp(self):
+        self.collection = hyou.collection.Collection(self.api)
+        self.spreadsheet = self.collection[
+            '1IWcyjDQhL0X8wdb1BZFAigJJ7WpBpmbgDrw1zQxyUHI']
+        self.worksheet2 = self.spreadsheet['Sheet2']
+        self.view = self.worksheet2.view(
+            end_row=self.NUM_ROWS, end_col=self.NUM_COLS
+        )
+
+    def test_clear(self):
+        data = [
+            [
+                '%s-%s' % (row_idx, cell_idx)
+                for cell_idx in range(self.view.cols)
+            ]
+            for row_idx in range(self.view.rows)
+        ]
+        self.view[:] = data
+        self.view.commit()
+        self.view.clear()
+        self.assertTrue(all(value == '' for row in self.view for value in row))

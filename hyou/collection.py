@@ -35,7 +35,7 @@ class Collection(util.LazyOrderedDictionary):
             with py3.open(json_path, 'r') as f:
                 json_text = f.read()
         credentials = util.parse_credentials(json_text)
-        return cls(api.API(credentials, discovery=discovery))
+        return cls(api.API(credentials=credentials, discovery=discovery))
 
     @api.retry_on_server_error
     def create_spreadsheet(self, title, rows=1000, cols=26):

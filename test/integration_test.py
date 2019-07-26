@@ -27,7 +27,7 @@ def main():
         os.path.dirname(__file__), 'creds', 'unittest-sheets.json')
     collection = hyou.login(json_path)
 
-    spreadsheet = collection['1hxNAHH-DUWgFcC603mFARGYOeKUwiRq56VsHOJSA5Z0']
+    spreadsheet = collection['1AJSfI3vDtb0CI4EPO9UnJ3Sg1D5ii33_t4qI2jl59SQ']
 
     print('Running tests with %s ...' % spreadsheet.url)
 
@@ -76,6 +76,9 @@ def main():
         )
         assert data_view[0][2] == '0.5'
         assert formula_view[0][2] == '=A1/B1'
+
+        data_view.clear()
+        assert all(value == '' for row in data_view for value in row)
 
     finally:
         spreadsheet.delete_worksheet(worksheet_title)

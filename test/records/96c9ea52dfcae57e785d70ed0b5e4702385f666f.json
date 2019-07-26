@@ -1,0 +1,1 @@
+{"method": "GET", "uri": "https://sheets.googleapis.com/v4/spreadsheets/1IWcyjDQhL0X8wdb1BZFAigJJ7WpBpmbgDrw1zQxyUHI/values/%27Sheet2%27%21A1%3AJ10?alt=json", "request": null, "response": "{\n  \"range\": \"Sheet2!A1:J10\",\n  \"majorDimension\": \"ROWS\"\n}\n"}

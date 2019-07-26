@@ -1,0 +1,1 @@
+{"method": "POST", "uri": "https://sheets.googleapis.com/v4/spreadsheets/1IWcyjDQhL0X8wdb1BZFAigJJ7WpBpmbgDrw1zQxyUHI/values/%27Sheet2%27%21A1%3AK11:clear?alt=json", "request": null, "response": "{\n  \"spreadsheetId\": \"1IWcyjDQhL0X8wdb1BZFAigJJ7WpBpmbgDrw1zQxyUHI\",\n  \"clearedRange\": \"Sheet2!A1:K11\"\n}\n"}

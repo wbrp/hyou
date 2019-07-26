@@ -65,6 +65,24 @@ class View(util.CustomMutableFixedList):
         self._cells_fetched = True
 
     @api.retry_on_server_error
+    def clear(self):
+        """
+        Clear all values of this view.
+
+        All other properties of the contained cells (such as formatting, data
+        validation etc.) are left unmodified.
+        """
+        params = {
+            'spreadsheetId': self._worksheet._spreadsheet.key,
+            'range': util.format_range_a1_notation(
+                self._worksheet.title, self._start_row, self._end_row + 1,
+                self._start_col, self._end_col + 1
+            )
+        }
+        self._api.sheets.spreadsheets().values().clear(**params).execute()
+        self.refresh()
+
+    @api.retry_on_server_error
     def commit(self):
         if not self._queued_updates:
             return

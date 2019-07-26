@@ -63,12 +63,12 @@ class SpreadsheetReadOnlyTest(SpreadsheetTestBase):
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
         self.spreadsheet = self.collection[
-            '1EQKX_l9GS2HSAMqQd_IrLjy5M0IFq1SbO3uUKVlfHjU']
+            '11NoixDrkf3GIFaJTbWYccHuNIkgtxIqeyf-oOSBttPA']
 
     def test_repr(self):
         self.assertEqual(
             str('Spreadsheet('
-                'key=\'1EQKX_l9GS2HSAMqQd_IrLjy5M0IFq1SbO3uUKVlfHjU\')'),
+                'key=\'11NoixDrkf3GIFaJTbWYccHuNIkgtxIqeyf-oOSBttPA\')'),
             repr(self.spreadsheet))
 
     def test_worksheet_accessors(self):
@@ -111,7 +111,7 @@ class SpreadsheetReadOnlyTest(SpreadsheetTestBase):
     def test_url(self):
         self.assertEqual(
             'https://docs.google.com/spreadsheets/d/'
-            '1EQKX_l9GS2HSAMqQd_IrLjy5M0IFq1SbO3uUKVlfHjU/edit',
+            '11NoixDrkf3GIFaJTbWYccHuNIkgtxIqeyf-oOSBttPA/edit',
             self.spreadsheet.url)
 
     def test_title(self):
@@ -144,7 +144,7 @@ class SpreadsheetReadWriteTest(SpreadsheetTestBase):
     def setUp(self):
         self.collection = hyou.collection.Collection(self.api)
         self.spreadsheet = self.collection[
-            '1cs7S44YeWzIx5AEJSUwP4zMsKKVsKrTi8kxNhJbqI08']
+            '1uzMKIenUo_ougmt_yS4qfcBx-q6KGLl6mD06CUI4ppA']
 
     def test_set_title(self):
         self.spreadsheet.title = 'SpreadsheetReadWriteTest'
