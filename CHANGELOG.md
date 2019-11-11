@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.2.1 (2019-11-11)
+
+- Handle new Google Sheets 100s error message.
+
 3.2.0 (2019-07-26)
 
 - Add `clear` method to `view.View`.
