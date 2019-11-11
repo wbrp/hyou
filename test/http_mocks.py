@@ -166,8 +166,8 @@ class ErrorHttp(ReplayHttp):
             'code': 429,
             'errors': [{
                 'domain': 'global',
-                'message': "Quota exceeded for quota group 'ReadGroup' "
-                           "and limit 'Read requests per user per 100 seconds' "
+                'message': "Quota exceeded for quota group 'ReadGroup' and "
+                           "limit 'Read requests per user per 100 seconds' "
                            "of service 'sheets.googleapis.com' for consumer "
                            "'project_number:1234'.",
                 'reason': 'rateLimitExceeded'
@@ -191,7 +191,8 @@ class ErrorHttp(ReplayHttp):
         """
         sleep_time = sum(call[0][0] for call in self.sleep_mock.call_args_list)
         if sleep_time <= self.max_sleep:
-            random.choice([self.rate_error1, self.rate_error2, self.server_error])()
+            random.choice(
+                [self.rate_error1, self.rate_error2, self.server_error])()
         else:
             return super(ErrorHttp, self).request(
                 uri, method, body, *args, **kwargs)
