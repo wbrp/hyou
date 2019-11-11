@@ -145,7 +145,7 @@ class ReplayHttp(object):
 
 class ErrorHttp(ReplayHttp):
 
-    rate_error_dict = {
+    rate_error_dict1 = {
         'error': {
             'code': 429,
             'errors': [{
@@ -161,6 +161,23 @@ class ErrorHttp(ReplayHttp):
                        "consumer 'project_number:19957049059'.",
             'status': 'RESOURCE_EXHAUSTED'}
     }
+    rate_error_dict2 = {
+        'error': {
+            'code': 429,
+            'errors': [{
+                'domain': 'global',
+                'message': "Quota exceeded for quota group 'ReadGroup' and "
+                           "limit 'Read requests per user per 100 seconds' "
+                           "of service 'sheets.googleapis.com' for consumer "
+                           "'project_number:1234'.",
+                'reason': 'rateLimitExceeded'
+            }],
+            'message': "Quota exceeded for quota group 'ReadGroup' and limit "
+                       "'Read requests per user per 100 seconds' of service "
+                       "'sheets.googleapis.com' for consumer "
+                       "'project_number:1234'.",
+            'status': 'RESOURCE_EXHAUSTED'}
+    }
 
     def __init__(self, json_name, max_sleep, sleep_mock):
         self.max_sleep = max_sleep
@@ -174,15 +191,23 @@ class ErrorHttp(ReplayHttp):
         """
         sleep_time = sum(call[0][0] for call in self.sleep_mock.call_args_list)
         if sleep_time <= self.max_sleep:
-            random.choice([self.rate_error, self.server_error])()
+            random.choice(
+                [self.rate_error1, self.rate_error2, self.server_error])()
         else:
             return super(ErrorHttp, self).request(
                 uri, method, body, *args, **kwargs)
 
     @staticmethod
-    def rate_error():
+    def rate_error1():
         error_code = 429
-        error_content = json.dumps(ErrorHttp.rate_error_dict).encode('utf8')
+        error_content = json.dumps(ErrorHttp.rate_error_dict1).encode('utf8')
+        response = httplib2.Response({'status': error_code})
+        raise googleapiclient.errors.HttpError(response, error_content)
+
+    @staticmethod
+    def rate_error2():
+        error_code = 429
+        error_content = json.dumps(ErrorHttp.rate_error_dict2).encode('utf8')
         response = httplib2.Response({'status': error_code})
         raise googleapiclient.errors.HttpError(response, error_content)
 
