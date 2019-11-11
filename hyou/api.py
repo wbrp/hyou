@@ -31,7 +31,7 @@ SHEETS_API_DISCOVERY_URL = (
 
 # Maximum amount of time we want to spend retrying failed requests.
 MAX_WAIT_TIME = 200
-SHORT_TERM_RATE_ERROR = '100s'
+SHORT_TERM_RATE_ERROR = ['100s', '100 seconds']
 
 
 def retry_on_server_error(wrapped_func):
@@ -83,7 +83,7 @@ def _is_retryable_err(http_error):
     if http_error.resp.status == 429:
         # Rate errors can either refer to the 100 seconds quota ("100s") or
         # the one day quota ("1d"). We can retry the former.
-        return SHORT_TERM_RATE_ERROR in str(http_error)
+        return any(error in str(http_error) for error in SHORT_TERM_RATE_ERROR)
 
     return False
 
