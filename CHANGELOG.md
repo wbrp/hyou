@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+3.2.2 (2020-02-05)
+
+- Retry all HTTP 429 errors.
+
 3.2.1 (2019-11-11)
 
 - Handle new Google Sheets 100s error message.
