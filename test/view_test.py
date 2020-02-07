@@ -236,6 +236,14 @@ class ViewReadWriteTest(ViewTestBase):
         self.view[0][4] = 'nya'
         self.view[1][0] = Dummy()
         self.view[1][4] = None
+
+        self.assertEqual(self.view[0][0], 28)
+        self.assertEqual(self.view[0][1], 28.3)
+        self.assertEqual(self.view[0][2], 'kotori-chan')
+        self.assertEqual(self.view[0][4], 'nya')
+        self.assertEqual(self.view[1][0], '<dummy>')
+        self.assertEqual(self.view[1][4], '')
+
         self.view.commit()
 
     def test_refresh(self):
