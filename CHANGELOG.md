@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+4.0.0 (2020-02-14)
+
+- Send numbers to the API instead of strings.
+
 3.2.2 (2020-02-05)
 
 - Retry all HTTP 429 errors.
