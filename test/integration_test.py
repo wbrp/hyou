@@ -17,12 +17,11 @@ from __future__ import (
 
 import os
 import random
-import sys
 
 import hyou
 
 
-def main():
+def test_integration():
     json_path = os.path.join(
         os.path.dirname(__file__), 'creds', 'unittest-sheets.json')
     collection = hyou.login(json_path)
@@ -85,7 +84,3 @@ def main():
         print('Removed %s' % worksheet_title)
 
     print('PASSED!')
-
-
-if __name__ == '__main__':
-    sys.exit(main())

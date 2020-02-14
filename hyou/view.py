@@ -210,16 +210,14 @@ class ViewRow(util.CustomMutableFixedList):
         if new_value is None:
             new_value = ''
         elif isinstance(new_value, six.integer_types):
-            new_value = '%d' % new_value
+            pass
         elif isinstance(new_value, float):
-            # Do best not to lose precision...
-            new_value = '%.20e' % new_value
+            pass
         elif isinstance(new_value, py3.bytes):
             # May raise UnicodeDecodeError.
             new_value = new_value.decode('ascii')
-        elif not isinstance(new_value, py3.str):
+        else:
             new_value = py3.str(new_value)
-        assert isinstance(new_value, py3.str)
         self._view._input_value_map[(self._row, col)] = new_value
         self._view._queued_updates.append((self._row, col, new_value))
 
