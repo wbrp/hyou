@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+4.1.0 (2020-03-06)
+
+- Add `Spreadsheet.make_batch_request` method.
+
 4.0.0 (2020-02-14)
 
 - Send numbers to the API instead of strings.
