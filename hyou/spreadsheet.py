@@ -125,3 +125,13 @@ class Spreadsheet(util.LazyOrderedDictionary):
         response = self._api.sheets.spreadsheets().batchUpdate(
             spreadsheetId=self.key, body=request).execute()
         return response['updatedSpreadsheet']
+
+    @api.retry_on_server_error
+    def make_batch_request(self, requests):
+        request = {
+            'requests': requests,
+            'include_spreadsheet_in_response': True,
+        }
+        response = self._api.sheets.spreadsheets().batchUpdate(
+            spreadsheetId=self.key, body=request).execute()
+        self.refresh(response)
