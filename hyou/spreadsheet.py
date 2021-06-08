@@ -134,4 +134,4 @@ class Spreadsheet(util.LazyOrderedDictionary):
         }
         response = self._api.sheets.spreadsheets().batchUpdate(
             spreadsheetId=self.key, body=request).execute()
-        self.refresh(response)
+        self.refresh(response['updatedSpreadsheet'])
