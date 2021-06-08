@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+4.1.1 (2021-06-08)
+
+- Fix `Spreadsheet.make_batch_request`'s response handling.
+
 4.1.0 (2020-03-06)
 
 - Add `Spreadsheet.make_batch_request` method.
