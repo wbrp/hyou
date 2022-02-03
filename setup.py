@@ -17,8 +17,8 @@ import os
 import setuptools
 
 REQUIRED = [
-    'google-api-python-client>=2,<3',
-    'google-auth>=2,<3',
+    'google-api-python-client>=1,<3',
+    'google-auth>=1,<3',
     'google-auth-httplib2>=0.0.3,<1',
 ]
 
