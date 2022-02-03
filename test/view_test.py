@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
-
 import time
 import unittest
 
 import googleapiclient.errors
 import hyou.api
 import hyou.collection
-import hyou.py3
 import hyou.util
 import mock
 import nose.tools
@@ -35,7 +31,7 @@ CREDENTIALS_FILE = 'unittest-sheets.json'
 class Dummy(object):
 
     def __str__(self):
-        return hyou.py3.str_to_native_str('<dummy>', encoding='ascii')
+        return '<dummy>'
 
 
 class ViewTestBase(unittest.TestCase):
@@ -166,9 +162,9 @@ class ViewReadOnlyTest(ViewTestBase):
 
     def test_repr(self):
         self.assertEqual(
-            str('View(%r)' %
-                [['honoka', 'eri', 'kotori', 'umi', 'rin'],
-                 ['maki', 'nozomi', 'hanayo', 'niko', '']]),
+            'View(%r)' %  # noqa: F507
+            [['honoka', 'eri', 'kotori', 'umi', 'rin'],
+             ['maki', 'nozomi', 'hanayo', 'niko', '']],
             repr(self.view))
 
     def test_properties(self):

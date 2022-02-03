@@ -30,12 +30,12 @@ class Spreadsheet(util.LazyOrderedDictionary):
     def __init__(self, api, key, entry):
         super(Spreadsheet, self).__init__(self._worksheet_enumerator, None)
         self._api = api
-        self._key = str(key)
+        self._key = key
         self._entry = entry
         self._updated = None
 
     def __repr__(self):
-        return str('Spreadsheet(key=%r)') % (self.key,)
+        return 'Spreadsheet(key=%r)' % self.key
 
     @api.retry_on_server_error
     def refresh(self, entry=None):

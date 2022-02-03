@@ -12,13 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
-
-import six
 
 from . import api
-from . import py3
 from . import util
 
 
@@ -34,7 +29,7 @@ class View(util.CustomMutableFixedList):
         self._end_col = end_col
         self._view_rows = [
             ViewRow(self, row, start_col, end_col)
-            for row in py3.range(start_row, end_row)]
+            for row in range(start_row, end_row)]
         self._input_value_map = {}
         self._cells_fetched = False
         self._queued_updates = []
@@ -54,7 +49,7 @@ class View(util.CustomMutableFixedList):
             self._start_col, self._end_col)
         response = self._api.sheets.spreadsheets().values().get(
             spreadsheetId=self._worksheet._spreadsheet.key,
-            range=py3.str_to_native_str(range_str, encoding='utf-8'),
+            range=range_str,
             **self._fetch_params).execute()
         self._input_value_map = {}
         for i, row in enumerate(response.get('values', [])):
@@ -118,7 +113,7 @@ class View(util.CustomMutableFixedList):
                 raise ValueError(
                     'Tried to assign %d values to %d element slice' %
                     (len(new_value), stop - start))
-            for i, new_value_one in py3.zip(py3.range(start, stop), new_value):
+            for i, new_value_one in zip(range(start, stop), new_value):
                 self[i] = new_value_one
             return
         self._view_rows[index][:] = new_value
@@ -130,7 +125,7 @@ class View(util.CustomMutableFixedList):
         return iter(self._view_rows)
 
     def __repr__(self):
-        return str('View(%r)') % (self._view_rows,)
+        return 'View(%r)' % self._view_rows
 
     @property
     def rows(self):
@@ -175,7 +170,7 @@ class ViewRow(util.CustomMutableFixedList):
             return ViewRow(
                 self._view, self._row,
                 self._start_col + start, self._start_col + stop)
-        util.check_type(index, six.integer_types)
+        util.check_type(index, int)
         if index < 0:
             col = self._end_col + index
         else:
@@ -197,10 +192,10 @@ class ViewRow(util.CustomMutableFixedList):
                 raise ValueError(
                     'Tried to assign %d values to %d element slice' %
                     (len(new_value), stop - start))
-            for i, new_value_one in py3.zip(py3.range(start, stop), new_value):
+            for i, new_value_one in zip(range(start, stop), new_value):
                 self[i] = new_value_one
             return
-        util.check_type(index, six.integer_types)
+        util.check_type(index, int)
         if index < 0:
             col = self._end_col + index
         else:
@@ -209,15 +204,15 @@ class ViewRow(util.CustomMutableFixedList):
             raise IndexError('Column %d is out of range.' % col)
         if new_value is None:
             new_value = ''
-        elif isinstance(new_value, six.integer_types):
+        elif isinstance(new_value, int):
             pass
         elif isinstance(new_value, float):
             pass
-        elif isinstance(new_value, py3.bytes):
+        elif isinstance(new_value, bytes):
             # May raise UnicodeDecodeError.
             new_value = new_value.decode('ascii')
         else:
-            new_value = py3.str(new_value)
+            new_value = str(new_value)
         self._view._input_value_map[(self._row, col)] = new_value
         self._view._queued_updates.append((self._row, col, new_value))
 
@@ -226,7 +221,7 @@ class ViewRow(util.CustomMutableFixedList):
 
     def __iter__(self):
         self._view._ensure_cells_fetched()
-        for col in py3.range(self._start_col, self._end_col):
+        for col in range(self._start_col, self._end_col):
             yield self._view._input_value_map.get((self._row, col), '')
 
     def __repr__(self):

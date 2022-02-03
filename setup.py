@@ -17,10 +17,9 @@ import os
 import setuptools
 
 REQUIRED = [
-    'google-api-python-client>=1.7.0,<2',
-    'google-auth>=1.6.0,<2',
+    'google-api-python-client>=2,<3',
+    'google-auth>=2,<3',
     'google-auth-httplib2>=0.0.3,<1',
-    'six>=1.11.0'
 ]
 
 
@@ -45,12 +44,10 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'License :: OSI Approved :: Apache Software License',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

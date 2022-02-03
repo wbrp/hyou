@@ -1,5 +1,9 @@
 Changelog
 ---------
+Unreleased (5.0.0)
+
+- Drop support for python <3.7
+- Upgrade to google-api-python-client v2
 
 4.1.1 (2021-06-08)
 

@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
 
 from . import api
-from . import py3
 from . import spreadsheet
 from . import util
 
@@ -32,7 +29,7 @@ class Collection(util.LazyOrderedDictionary):
     @classmethod
     def login(cls, json_path=None, json_text=None, discovery=False):
         if json_text is None:
-            with py3.open(json_path, 'r') as f:
+            with open(json_path, 'r') as f:
                 json_text = f.read()
         credentials = util.parse_credentials(json_text)
         return cls(api.API(credentials=credentials, discovery=discovery))

@@ -21,7 +21,6 @@ import os
 import unittest
 
 import hyou.util
-import hyou.py3
 import mock
 
 
@@ -54,19 +53,19 @@ class ParseCredentialsTest(unittest.TestCase):
     def test_login_user(self):
         json_path = os.path.join(
             os.path.dirname(__file__), 'creds', 'example-user.json')
-        with hyou.py3.open(json_path) as f:
+        with open(json_path) as f:
             hyou.util.parse_credentials(f.read())
 
     def test_login_bot(self):
         json_path = os.path.join(
             os.path.dirname(__file__), 'creds', 'example-bot.json')
-        with hyou.py3.open(json_path) as f:
+        with open(json_path) as f:
             hyou.util.parse_credentials(f.read())
 
     def test_login_invalid(self):
         json_path = os.path.join(
             os.path.dirname(__file__), 'creds', 'example-invalid.json')
-        with hyou.py3.open(json_path) as f:
+        with open(json_path) as f:
             self.assertRaises(
                 ValueError, hyou.util.parse_credentials, f.read())
 
@@ -84,10 +83,10 @@ class LazyOrderedDictionaryTest(unittest.TestCase):
             ('A', 'apple'), ('B', 'banana'), ('C', 'cinamon')]
         # iter()
         it = iter(self.dict)
-        self.assertEqual('A', hyou.py3.next(it))
-        self.assertEqual('B', hyou.py3.next(it))
-        self.assertEqual('C', hyou.py3.next(it))
-        self.assertRaises(StopIteration, hyou.py3.next, it)
+        self.assertEqual('A', next(it))
+        self.assertEqual('B', next(it))
+        self.assertEqual('C', next(it))
+        self.assertRaises(StopIteration, next, it)
         # len()
         self.assertEqual(3, len(self.dict))
         # keys()
