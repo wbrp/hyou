@@ -167,8 +167,8 @@ class ViewReadOnlyTest(ViewTestBase):
     def test_repr(self):
         self.assertEqual(
             str('View(%r)' %
-                [['honoka', 'eri', 'kotori', 'umi', 'rin'],
-                 ['maki', 'nozomi', 'hanayo', 'niko', '']]),
+                ([['honoka', 'eri', 'kotori', 'umi', 'rin'],
+                 ['maki', 'nozomi', 'hanayo', 'niko', '']],)),
             repr(self.view))
 
     def test_properties(self):
