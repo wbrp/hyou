@@ -17,13 +17,13 @@ import json
 import logging
 import os
 import random
+from urllib import parse
 
 import google_auth_httplib2
 import googleapiclient.errors
 import httplib2
-import hyou.util
-from six.moves.urllib import parse
 
+import hyou.util
 
 RECORDS_DIR = os.path.join(os.path.dirname(__file__), 'records')
 

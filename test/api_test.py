@@ -12,21 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
-
 import contextlib
 import logging
 import time
 import unittest
+from unittest import mock
 
 import googleapiclient.errors
+import pytest
+
 import hyou.api
-import mock
-import nose.tools
 
-import http_mocks
-
+from . import http_mocks
 
 CREDENTIALS_FILE = 'unittest-collection.json'
 
@@ -71,7 +68,7 @@ class APITest(unittest.TestCase):
             sleep_mock.reset_mock()
             # Conversely, this constructor should fail as `ErrorHttp` will
             # return error for a longer time than we're willing to wait
-            with nose.tools.assert_raises(googleapiclient.errors.HttpError):
+            with pytest.raises(googleapiclient.errors.HttpError):
                 hyou.api.API(
                     http_mocks.ErrorHttp(
                         CREDENTIALS_FILE, hyou.api.MAX_WAIT_TIME+1, sleep_mock

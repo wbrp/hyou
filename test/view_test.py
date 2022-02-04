@@ -14,16 +14,16 @@
 
 import time
 import unittest
+from unittest import mock
 
 import googleapiclient.errors
+import pytest
+
 import hyou.api
 import hyou.collection
 import hyou.util
-import mock
-import nose.tools
 
-import http_mocks
-
+from . import http_mocks
 
 CREDENTIALS_FILE = 'unittest-sheets.json'
 
@@ -274,7 +274,7 @@ class RetryViewReadWriteTest(RetryTestBase, ViewReadWriteTest):
         original_max_sleep = self.error_http.max_sleep
         self.error_http.max_sleep += 10
 
-        with nose.tools.assert_raises(googleapiclient.errors.HttpError):
+        with pytest.raises(googleapiclient.errors.HttpError):
             self.test_write()
 
         self.error_http.max_sleep = original_max_sleep
