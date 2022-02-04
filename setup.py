@@ -41,6 +41,7 @@ setuptools.setup(
         'tools/generate_oauth2_credentials.py',
     ],
     install_requires=REQUIRED,
+    python_requires='>=3.7',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',
