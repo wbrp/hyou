@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
-
-import six
 
 from . import exception
 from . import util
 from . import view
 
 
-class Worksheet(object):
+class Worksheet:
 
     def __init__(self, spreadsheet, api, entry):
         self._spreadsheet = spreadsheet
@@ -30,7 +26,7 @@ class Worksheet(object):
         self._entry = entry
 
     def __repr__(self):
-        return str('Worksheet(key=%r)') % (self.key,)
+        return 'Worksheet(key=%r)' % self.key
 
     def refresh(self, entry=None):
         if entry is not None:
@@ -62,8 +58,8 @@ class Worksheet(object):
         )
 
     def set_size(self, rows, cols):
-        util.check_type(rows, six.integer_types)
-        util.check_type(cols, six.integer_types)
+        util.check_type(rows, int)
+        util.check_type(cols, int)
         if not (rows >= 0 and cols >= 0):
             raise ValueError('Non-positive size is not allowed')
         new_entry = self._make_single_batch_request(
@@ -81,8 +77,8 @@ class Worksheet(object):
         self.refresh(new_entry)
 
     def set_frozen_size(self, rows, cols):
-        util.check_type(rows, six.integer_types)
-        util.check_type(cols, six.integer_types)
+        util.check_type(rows, int)
+        util.check_type(cols, int)
         if not (rows >= 0 and cols >= 0):
             raise ValueError('Non-positive size is not allowed')
         new_entry = self._make_single_batch_request(

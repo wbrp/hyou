@@ -1,5 +1,9 @@
 Changelog
 ---------
+5.0.0 (2022-02-04)
+
+- Drop support for python <3.7.
+- Allow using v2 of `google-api-python-client` and `google-auth`.
 
 4.1.1 (2021-06-08)
 

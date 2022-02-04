@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
 
 import json
 import string
 
 import google.oauth2.credentials
 import google.oauth2.service_account
-import six
 
-from . import py3
 
 SCOPES = (
     'https://spreadsheets.google.com/feeds',
@@ -114,7 +110,7 @@ class LazyOrderedDictionary(object):
         return list(self.iteritems())
 
     def __getitem__(self, key):
-        if isinstance(key, six.integer_types):
+        if isinstance(key, int):
             self._ensure_enumerated()
             return self._cache_list[key][1]
         index = self._cache_index.get(key)
@@ -179,7 +175,7 @@ class CustomMutableFixedList(object):
     def __eq__(self, other):
         if len(self) != len(other):
             return False
-        for a, b in py3.zip(self, other):
+        for a, b in zip(self, other):
             if a != b:
                 return False
         return True
@@ -188,13 +184,13 @@ class CustomMutableFixedList(object):
         return not (self == other)
 
     def __lt__(self, other):
-        for a, b in py3.zip(self, other):
+        for a, b in zip(self, other):
             if a != b:
                 return a < b
         return len(self) < len(other)
 
     def __le__(self, other):
-        for a, b in py3.zip(self, other):
+        for a, b in zip(self, other):
             if a != b:
                 return a < b
         return len(self) <= len(other)

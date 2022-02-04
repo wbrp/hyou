@@ -12,22 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
-
 import time
 import unittest
+from unittest import mock
 
 import googleapiclient.errors
+import pytest
+
 import hyou.api
 import hyou.collection
-import hyou.py3
 import hyou.util
-import mock
-import nose.tools
 
-import http_mocks
-
+from . import http_mocks
 
 CREDENTIALS_FILE = 'unittest-sheets.json'
 
@@ -35,7 +31,7 @@ CREDENTIALS_FILE = 'unittest-sheets.json'
 class Dummy(object):
 
     def __str__(self):
-        return hyou.py3.str_to_native_str('<dummy>', encoding='ascii')
+        return '<dummy>'
 
 
 class ViewTestBase(unittest.TestCase):
@@ -166,9 +162,9 @@ class ViewReadOnlyTest(ViewTestBase):
 
     def test_repr(self):
         self.assertEqual(
-            str('View(%r)' %
-                [['honoka', 'eri', 'kotori', 'umi', 'rin'],
-                 ['maki', 'nozomi', 'hanayo', 'niko', '']]),
+            'View(%r)' %  # noqa: F507
+            [['honoka', 'eri', 'kotori', 'umi', 'rin'],
+             ['maki', 'nozomi', 'hanayo', 'niko', '']],
             repr(self.view))
 
     def test_properties(self):
@@ -278,7 +274,7 @@ class RetryViewReadWriteTest(RetryTestBase, ViewReadWriteTest):
         original_max_sleep = self.error_http.max_sleep
         self.error_http.max_sleep += 10
 
-        with nose.tools.assert_raises(googleapiclient.errors.HttpError):
+        with pytest.raises(googleapiclient.errors.HttpError):
             self.test_write()
 
         self.error_http.max_sleep = original_max_sleep

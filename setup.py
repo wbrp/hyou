@@ -17,10 +17,9 @@ import os
 import setuptools
 
 REQUIRED = [
-    'google-api-python-client>=1.7.0,<2',
-    'google-auth>=1.6.0,<2',
+    'google-api-python-client>=1,<3',
+    'google-auth>=1,<3',
     'google-auth-httplib2>=0.0.3,<1',
-    'six>=1.11.0'
 ]
 
 
@@ -31,7 +30,7 @@ def read_file(name):
 
 setuptools.setup(
     name='hyou',
-    version='4.1.1',
+    version='5.0.0',
     author='Shuhei Takahashi',
     author_email='takahashi.shuhei@gmail.com',
     description='Pythonic Interface to access Google Spreadsheet',
@@ -42,15 +41,14 @@ setuptools.setup(
         'tools/generate_oauth2_credentials.py',
     ],
     install_requires=REQUIRED,
+    python_requires='>=3.7',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'License :: OSI Approved :: Apache Software License',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

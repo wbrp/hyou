@@ -12,22 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
-
 import hashlib
 import json
 import logging
 import os
 import random
+from urllib import parse
 
 import google_auth_httplib2
 import googleapiclient.errors
 import httplib2
-import hyou.py3
-import hyou.util
-from six.moves.urllib import parse
 
+import hyou.util
 
 RECORDS_DIR = os.path.join(os.path.dirname(__file__), 'records')
 
@@ -43,7 +39,7 @@ def _canonicalize_uri(uri):
 
 def _canonicalize_json(body_json):
     # body_json can be bytes or str.
-    if isinstance(body_json, hyou.py3.str):
+    if isinstance(body_json, str):
         json_str = body_json
     else:
         json_str = body_json.decode('utf-8')
@@ -64,7 +60,7 @@ def _load_records():
     records = {}
     for filename in sorted(os.listdir(RECORDS_DIR)):
         record_path = os.path.join(RECORDS_DIR, filename)
-        with hyou.py3.open(record_path, 'r', encoding='utf-8') as f:
+        with open(record_path, 'r', encoding='utf-8') as f:
             record = json.load(f)
             record['_path'] = record_path
             body_bytes = (
@@ -92,7 +88,7 @@ class ReplayHttp(object):
         else:
             json_path = os.path.join(
                 os.path.dirname(__file__), 'creds', json_name)
-            with hyou.py3.open(json_path, 'r') as f:
+            with open(json_path, 'r') as f:
                 credentials = hyou.util.parse_credentials(f.read())
             self._real_http = google_auth_httplib2.AuthorizedHttp(credentials)
         self._records = _load_records()

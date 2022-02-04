@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
 
 import unittest
 
 import hyou.api
 import hyou.collection
 
-import http_mocks
+from . import http_mocks
 
 
 class CollectionReadOnlyTest(unittest.TestCase):

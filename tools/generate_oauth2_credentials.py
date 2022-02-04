@@ -62,14 +62,13 @@ def main(argv):
     print(url)
     print()
 
-    code = py3.input('Code: ').strip()
+    code = input('Code: ').strip()
 
     credentials = flow.step2_exchange(code)
 
-    with py3.open(opts.output_json_path, 'wb') as f:
+    with open(opts.output_json_path, 'wb') as f:
         os.fchmod(f.fileno(), 0o600)
-        f.write(
-            py3.native_str_to_bytes(credentials.to_json(), encoding='utf-8'))
+        f.write(credentials.to_json().encode())
 
     print()
     print('Credentials successfully saved to %s' % opts.output_json_path)

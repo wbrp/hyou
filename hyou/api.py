@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals)
 
 import functools
 import random
@@ -46,8 +44,7 @@ def retry_on_server_error(wrapped_func):
     return wrapper
 
 
-class _Backoff():
-
+class _Backoff:
     """Helper class to keep state when doing exponential backoff."""
 
     def __init__(self, max_wait_time):
@@ -107,7 +104,7 @@ def _do_exp_backoff(func, max_wait_time):
             backoff.backoff(exc)
 
 
-class API(object):
+class API:
 
     @retry_on_server_error
     def __init__(self, http=None, credentials=None, discovery=False):
