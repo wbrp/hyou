@@ -1,0 +1,5 @@
+[repositories.devpi_wbrp]
+url = "https://devpi.wbrp.ch/root/wbrp/"
+
+[repositories.devpi_staging]
+url = "https://devpi.wbrp.ch/root/staging/"

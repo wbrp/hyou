@@ -1,0 +1,55 @@
+[tool.poetry]
+name = "hyou"
+version = "5.1.0"
+description = "Pythonic Interface to access Google Spreadsheet"
+authors = ["Shuhei Takahashi <takahashi.shuhei@gmail.com>", "Webrepublic AG"]
+maintainers = ["Webrepublic AG"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/wbrp/hyou"
+repository = "https://github.com/wbrp/hyou"
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+
+[tool.poetry.dependencies]
+python = ">=3.7.2, <3.11"
+
+google-api-python-client = "^2.80.0"
+google-auth = "^2.16.2"
+google-auth-httplib2 = "^0.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.2"
+pytest-cov = "^4.0.0"
+pylint = "^2.16.3"
+black = "^23.1.0"
+tox = "^4.4.6"
+
+
+[[tool.poetry.source]]
+name = "devpi"
+url = "https://devpi.wbrp.ch/root/wbrp/+simple/"
+default = false
+secondary = false
+
+
+[tool.black]
+line-length = 100
+skip-string-normalization = true
+target-version = ["py38"]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
