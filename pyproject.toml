@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hyou"
-version = "5.1.0"
+version = "5.0.0"
 description = "Pythonic Interface to access Google Spreadsheet"
 authors = ["Shuhei Takahashi <takahashi.shuhei@gmail.com>", "Webrepublic AG"]
 maintainers = ["Webrepublic AG"]
