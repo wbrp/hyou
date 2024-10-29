@@ -1,5 +1,10 @@
 Changelog
 ---------
+6.0.0 (2024-10-29)
+
+- Drop support for python 3.7.
+- Add support for python 3.11.
+
 5.0.0 (2022-02-04)
 
 - Drop support for python <3.7.
