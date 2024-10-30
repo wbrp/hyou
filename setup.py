@@ -30,7 +30,7 @@ def read_file(name):
 
 setuptools.setup(
     name='hyou',
-    version='5.0.0',
+    version='6.0.0',
     author='Shuhei Takahashi',
     author_email='takahashi.shuhei@gmail.com',
     description='Pythonic Interface to access Google Spreadsheet',
@@ -41,14 +41,14 @@ setuptools.setup(
         'tools/generate_oauth2_credentials.py',
     ],
     install_requires=REQUIRED,
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'License :: OSI Approved :: Apache Software License',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
